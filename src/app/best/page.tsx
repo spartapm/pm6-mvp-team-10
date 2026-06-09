@@ -83,10 +83,15 @@ export default function BestPage() {
                 <span className="font-semibold">{formatPrice(product.price)}원</span>
               </div>
               <p className="text-[10px] text-neutral-400 line-through">
-                {formatPrice(Math.round(product.price / (1 - product.discountRate / 100)))}원
+                {formatPrice(
+                  product.originalPrice ??
+                    Math.round(product.price / (1 - product.discountRate / 100)),
+                )}
+                원
               </p>
               <p className="text-[10px] text-neutral-500">
                 ★ {product.rating} ({product.reviewCount.toLocaleString()})
+                {product.likeCount ? ` ♥ ${product.likeCount}` : ""}
               </p>
               <div className="mt-1 flex gap-1">
                 <span className="rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] text-white">

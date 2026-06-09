@@ -44,8 +44,6 @@ export default function ShortformContent() {
     );
   }
 
-  const nickname = session.nickname || "송희";
-
   return (
     <AppShell>
       <main className="bg-white pb-2">
@@ -53,10 +51,9 @@ export default function ShortformContent() {
           <h1 className="text-[32px] font-normal leading-none text-black">
             내 취향 숏폼
           </h1>
-          <div className="mt-2 text-base font-bold leading-normal text-[rgba(0,0,0,0.6)]">
-            <p>{style} 스타일을 좋아하는</p>
-            <p>{nickname}님께 추천하는 콘텐츠예요.</p>
-          </div>
+          <p className="mt-2 text-base font-bold leading-normal text-[rgba(0,0,0,0.6)]">
+            {style}을 좋아하는 사람에게 추천하는 콘텐츠예요.
+          </p>
         </div>
 
         <div className="mt-4">

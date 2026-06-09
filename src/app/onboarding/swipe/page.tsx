@@ -59,8 +59,8 @@ export default function SwipePage() {
 
       <div className="mt-8 flex flex-1 flex-col">
         <SwipeCard
+          key={`${currentIndex}-${currentCard.id}`}
           image={currentCard}
-          showGuide={currentIndex === 0}
           onLike={() => handleChoice("like")}
           onDislike={() => handleChoice("dislike")}
         />

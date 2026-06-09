@@ -40,6 +40,8 @@ export interface Product {
   discountRate: number;
   rating: number;
   reviewCount: number;
+  originalPrice?: number;
+  likeCount?: string;
   coupon?: string;
   category: string;
   color?: string;

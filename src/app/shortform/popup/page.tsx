@@ -48,12 +48,12 @@ function ShortformPopupContent() {
       <button
         type="button"
         onClick={closeToHome}
-        className="absolute inset-0 z-0"
+        className="fixed inset-0 z-10 cursor-default"
         aria-label="닫기"
       />
 
-      <div className="relative z-10 mx-auto min-h-dvh max-w-[402px] pt-[127px]">
-        <div className="min-h-[761px] rounded-[20px] border border-black/20 bg-white px-[25px] pb-10 pt-[65px]">
+      <div className="pointer-events-none relative z-20 mx-auto min-h-dvh max-w-[402px] pt-[127px]">
+        <div className="pointer-events-auto min-h-[761px] rounded-[20px] border border-black/20 bg-white px-[25px] pb-10 pt-[65px]">
           <h2 className="px-4 text-[28px] font-bold leading-tight text-black">
             이 스타일이 마음에 든다면?
           </h2>

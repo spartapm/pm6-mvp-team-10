@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import HomeTabNav from "@/components/layout/HomeTabNav";
@@ -11,23 +10,14 @@ import {
   getHomeContentsByStyle,
   getProductsByStyle,
 } from "@/data/mock-data";
-import { useOnboarding } from "@/context/onboarding-context";
 import type { StyleName } from "@/lib/types";
 
 export default function HomeContent() {
   const searchParams = useSearchParams();
-  const { session } = useOnboarding();
 
-  const style = useMemo(() => {
-    const param = searchParams.get("style") as StyleName | null;
-    if (param) return param;
-    if (session.result?.primaryStyle) return session.result.primaryStyle;
-    if (session.result?.randomStyle) return session.result.randomStyle;
-    return null;
-  }, [searchParams, session.result]);
-
-  const isPersonalized = Boolean(style) && !session.skippedOnboarding;
-  const activeStyle = style ?? "미니멀";
+  const styleParam = searchParams.get("style") as StyleName | null;
+  const isPersonalized = Boolean(styleParam);
+  const activeStyle: StyleName = styleParam ?? "미니멀";
   const products = getProductsByStyle(activeStyle);
   const brands = getBrandsByStyle(activeStyle);
   const homeContents = getHomeContentsByStyle(activeStyle);
@@ -46,11 +36,7 @@ export default function HomeContent() {
             </p>
             <span className="text-lg font-bold text-[#6f2dc4]">{">"}</span>
           </div>
-        ) : (
-          <div className="mx-4 mt-3 rounded-[10px] bg-neutral-100 px-4 py-2 text-sm text-neutral-500">
-            일반 추천 홈 (개인화 미적용)
-          </div>
-        )}
+        ) : null}
 
         <section className="mt-6 px-3">
           <div className="flex items-center justify-between px-1">

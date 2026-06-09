@@ -1,7 +1,15 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { assets } from "@/data/figma-assets";
+import {
+  ShortformFollowIcon,
+  ShortformLikeIcon,
+  ShortformMuteIcon,
+  ShortformShareIcon,
+  ShortformUnmuteIcon,
+} from "@/components/shortform/ShortformActionIcons";
 import { SHORTFORM_PRODUCT_IMAGES } from "@/data/shortform-product-images";
 import type { ShortformItem } from "@/lib/types";
 
@@ -18,9 +26,22 @@ export default function ShortformPlayer({
   variant = "full",
   activeTab = "추천",
 }: ShortformPlayerProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
   const poster = item.previewPosterUrl ?? item.posterUrl;
   const products = item.products.slice(0, 3);
   const productImages = SHORTFORM_PRODUCT_IMAGES[item.style];
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const nextMuted = !isMuted;
+    video.muted = nextMuted;
+    setIsMuted(nextMuted);
+    if (!nextMuted) {
+      void video.play();
+    }
+  };
 
   if (variant === "preview") {
     return (
@@ -30,6 +51,7 @@ export default function ShortformPlayer({
       >
         {item.videoUrl ? (
           <video
+            ref={videoRef}
             className="h-full w-full object-contain"
             src={item.videoUrl}
             poster={item.posterUrl}
@@ -49,14 +71,20 @@ export default function ShortformPlayer({
             unoptimized
           />
         )}
-        <Image
-          src={assets.shortformMuteSm}
-          alt=""
-          width={10}
-          height={10}
-          unoptimized
-          className="absolute right-1.5 top-1.5"
-        />
+        {item.videoUrl ? (
+          <button
+            type="button"
+            onClick={toggleMute}
+            className="absolute right-1.5 top-1.5 flex size-5 items-center justify-center"
+            aria-label={isMuted ? "소리 켜기" : "소리 끄기"}
+          >
+            {isMuted ? (
+              <ShortformMuteIcon size={10} className="opacity-100" />
+            ) : (
+              <ShortformUnmuteIcon size={10} className="opacity-100" />
+            )}
+          </button>
+        ) : null}
       </div>
     );
   }
@@ -67,6 +95,7 @@ export default function ShortformPlayer({
     <div className="relative h-[659px] w-full overflow-hidden rounded-[20px] bg-neutral-900">
       <div className="absolute inset-0 flex items-center justify-center">
         <video
+          ref={videoRef}
           className="h-full w-full object-cover object-center"
           src={videoUrl}
           poster={item.posterUrl}
@@ -107,10 +136,20 @@ export default function ShortformPlayer({
           className="absolute top-[-31px] left-[-1px] h-auto w-[81px]"
           unoptimized
         />
-        <Image src={assets.shortformFollow} alt="팔로우" width={27} height={27} />
-        <Image src={assets.shortformMute} alt="음소거" width={27} height={27} />
-        <Image src={assets.shortformShare} alt="공유" width={27} height={27} />
-        <Image src={assets.shortformLike} alt="좋아요" width={27} height={27} />
+        <ShortformFollowIcon />
+        <button
+          type="button"
+          onClick={toggleMute}
+          aria-label={isMuted ? "소리 켜기" : "소리 끄기"}
+        >
+          {isMuted ? (
+            <ShortformMuteIcon size={32} />
+          ) : (
+            <ShortformUnmuteIcon size={32} />
+          )}
+        </button>
+        <ShortformShareIcon />
+        <ShortformLikeIcon />
       </div>
 
       <div className="absolute top-[463px] left-[22px] h-fit w-fit">

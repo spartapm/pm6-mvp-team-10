@@ -82,14 +82,14 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       ];
       const nextIndex = currentIndex + 1;
 
-      setRecords(nextRecords);
-      setCurrentIndex(nextIndex);
-
-      // 8장 선택 후 9번째 카드를 덱에 추가해 화면에 표시
+      let nextDeck = deck;
       if (nextIndex === 8 && deck.length === 8) {
-        const ninth = getNinthImage(SWIPE_IMAGES, nextRecords);
-        setDeck([...deck, ninth]);
+        nextDeck = [...deck, getNinthImage(SWIPE_IMAGES, nextRecords)];
       }
+
+      setRecords(nextRecords);
+      setDeck(nextDeck);
+      setCurrentIndex(nextIndex);
 
       if (nextIndex >= TOTAL_CARDS) {
         const result = analyzeSwipeResult(nextRecords);

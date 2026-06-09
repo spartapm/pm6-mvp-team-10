@@ -1,53 +1,88 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { assets } from "@/data/figma-assets";
 import type { SwipeImage } from "@/lib/types";
+
+const SWIPE_THRESHOLD = 80;
 
 type SwipeCardProps = {
   image: SwipeImage;
   onLike: () => void;
   onDislike: () => void;
-  showGuide?: boolean;
 };
 
 export default function SwipeCard({
   image,
   onLike,
   onDislike,
-  showGuide = false,
 }: SwipeCardProps) {
+  const [offsetX, setOffsetX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startX = useRef(0);
+  const isDraggingRef = useRef(false);
+
+  const resetDrag = useCallback(() => {
+    setOffsetX(0);
+    setIsDragging(false);
+    isDraggingRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    resetDrag();
+  }, [image.id, resetDrag]);
+
+  const commitSwipe = useCallback(
+    (direction: "like" | "dislike") => {
+      setOffsetX(direction === "like" ? 400 : -400);
+      if (direction === "like") onLike();
+      else onDislike();
+    },
+    [onLike, onDislike],
+  );
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    startX.current = e.clientX;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    setOffsetX(e.clientX - startX.current);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    setIsDragging(false);
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+
+    const delta = e.clientX - startX.current;
+    if (delta > SWIPE_THRESHOLD) {
+      commitSwipe("like");
+    } else if (delta < -SWIPE_THRESHOLD) {
+      commitSwipe("dislike");
+    } else {
+      resetDrag();
+    }
+  };
+
+  const rotation = offsetX * 0.05;
+
   return (
     <div className="flex flex-1 flex-col">
-      {showGuide ? (
-        <div className="mb-6 text-center text-lg font-bold leading-[30px] text-[rgba(0,0,0,0.6)]">
-          <p>
-            마음에 들면 <span className="text-black">오른쪽</span>으로
-          </p>
-          <p>
-            별로예요는 <span className="text-black">왼쪽</span>으로
-          </p>
-        </div>
-      ) : (
-        <div className="mb-6 h-[60px]" />
-      )}
+      <div className="mb-6 text-center text-lg font-bold leading-[30px] text-[rgba(0,0,0,0.6)]">
+        <p>
+          마음에 들면 <span className="text-black">오른쪽</span>으로
+        </p>
+        <p>
+          별로예요는 <span className="text-black">왼쪽</span>으로
+        </p>
+      </div>
 
       <div className="relative mx-auto flex w-full max-w-[328px] items-center justify-center">
-        <button
-          type="button"
-          onClick={onDislike}
-          className="absolute -left-1 z-10 flex size-12 items-center justify-center"
-          aria-label="별로예요"
-        >
-          <Image
-            src={assets.iconArrow}
-            alt=""
-            width={48}
-            height={48}
-            className="rotate-180"
-          />
-        </button>
-
         <div className="relative w-[276px]">
           <div
             className="absolute left-3 top-4 h-[412px] w-[265px] -rotate-[7.5deg] overflow-hidden rounded-[40px] opacity-40"
@@ -73,27 +108,29 @@ export default function SwipeCard({
               sizes="265px"
             />
           </div>
-          <div className="relative h-[412px] w-[276px] -rotate-[5deg] overflow-hidden rounded-[40px] shadow-[0_4px_40px_rgba(0,0,0,0.25)]">
+          <div
+            className="relative h-[412px] w-[276px] touch-none select-none overflow-hidden rounded-[40px] shadow-[0_4px_40px_rgba(0,0,0,0.25)]"
+            style={{
+              transform: `translateX(${offsetX}px) rotate(${-5 + rotation}deg)`,
+              transition: isDragging ? "none" : "transform 0.2s ease-out",
+            }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={resetDrag}
+          >
             <Image
               src={image.imageUrl}
               alt={image.label}
               fill
-              className="object-cover"
+              className="pointer-events-none object-cover"
               sizes="276px"
               priority
+              draggable={false}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={onLike}
-          className="absolute -right-1 z-10 flex size-12 items-center justify-center shadow-[0_4px_40px_rgba(0,0,0,0.25)]"
-          aria-label="좋아요"
-        >
-          <Image src={assets.iconArrow} alt="" width={48} height={48} />
-        </button>
       </div>
 
       <p className="mt-8 text-center text-lg font-bold text-[rgba(0,0,0,0.6)]">
