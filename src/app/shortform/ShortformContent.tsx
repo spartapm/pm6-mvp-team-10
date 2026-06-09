@@ -6,7 +6,7 @@ import AppShell from "@/components/layout/AppShell";
 import ShortformPlayer from "@/components/shortform/ShortformPlayer";
 import { getShortformsByStyle } from "@/data/mock-data";
 import { useOnboarding } from "@/context/onboarding-context";
-import { routes } from "@/lib/routes";
+import { getSessionHomeStyle, routes } from "@/lib/routes";
 import type { StyleName } from "@/lib/types";
 
 export default function ShortformContent() {
@@ -34,7 +34,9 @@ export default function ShortformContent() {
           <p className="text-neutral-500">아직 준비 중인 콘텐츠예요</p>
           <button
             type="button"
-            onClick={() => router.push(routes.home())}
+            onClick={() =>
+              router.push(routes.home(getSessionHomeStyle(session.result)))
+            }
             className="mt-4 text-sm text-black underline"
           >
             홈으로 이동

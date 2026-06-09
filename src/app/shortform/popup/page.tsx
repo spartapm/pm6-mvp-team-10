@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ShortformPlayer from "@/components/shortform/ShortformPlayer";
 import { getShortformPreview } from "@/data/mock-data";
 import { useOnboarding } from "@/context/onboarding-context";
-import { routes } from "@/lib/routes";
+import { getSessionHomeStyle, routes } from "@/lib/routes";
 import type { StyleName } from "@/lib/types";
 
 function ShortformPopupContent() {
@@ -41,7 +41,8 @@ function ShortformPopupContent() {
 
   const goShortform = () => router.push(routes.shortform.index(style));
   const goHome = () => router.push(routes.home(style));
-  const closeToHome = () => router.push(routes.home());
+  const closeToHome = () =>
+    router.push(routes.home(getSessionHomeStyle(session.result)));
 
   return (
     <div className="relative min-h-dvh bg-[#8f8f90]">

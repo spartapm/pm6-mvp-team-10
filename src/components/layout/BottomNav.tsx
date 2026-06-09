@@ -4,23 +4,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { assets } from "@/data/figma-assets";
-import { isBestPath, isHomePath, routes } from "@/lib/routes";
-
-const NAV_ITEMS = [
-  { href: routes.home(), label: "홈", icon: assets.navHome, disabled: false },
-  { href: routes.best, label: "카테고리", icon: assets.navCategory, disabled: false },
-  { href: routes.home(), label: "검색", icon: assets.navSearch, disabled: true },
-  { href: routes.home(), label: "찜", icon: assets.navLike, disabled: true },
-  { href: routes.home(), label: "마이", icon: assets.navMy, disabled: true },
-] as const;
+import { useOnboarding } from "@/context/onboarding-context";
+import { getSessionHomeStyle, isBestPath, isHomePath, routes } from "@/lib/routes";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { session } = useOnboarding();
+  const homeStyle = getSessionHomeStyle(session.result);
+  const homeHref = routes.home(homeStyle);
+
+  const navItems = [
+    { href: homeHref, label: "홈", icon: assets.navHome, disabled: false },
+    { href: routes.best, label: "카테고리", icon: assets.navCategory, disabled: false },
+    { href: homeHref, label: "검색", icon: assets.navSearch, disabled: true },
+    { href: homeHref, label: "찜", icon: assets.navLike, disabled: true },
+    { href: homeHref, label: "마이", icon: assets.navMy, disabled: true },
+  ] as const;
 
   return (
     <nav className="sticky bottom-0 z-20 border-t border-neutral-100 bg-white px-2 pb-[env(safe-area-inset-bottom)]">
       <ul className="grid h-[50px] grid-cols-5 items-center">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const active =
             !item.disabled &&
             (item.href === routes.best

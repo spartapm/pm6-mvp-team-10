@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { isBestPath, routes } from "@/lib/routes";
+import { useOnboarding } from "@/context/onboarding-context";
+import { getSessionHomeStyle, isBestPath, routes } from "@/lib/routes";
 import type { StyleName } from "@/lib/types";
 
 const HOME_TABS = ["추천", "베스트", "신상", "브랜드", "이벤트"] as const;
@@ -22,10 +23,12 @@ function getActiveTab(pathname: string): HomeTab {
 export default function HomeTabNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { session } = useOnboarding();
   const activeTab = getActiveTab(pathname);
 
-  const style = searchParams.get("style") as StyleName | null;
-  const homeHref = routes.home(style);
+  const styleParam = searchParams.get("style") as StyleName | null;
+  const sessionStyle = getSessionHomeStyle(session.result);
+  const homeHref = routes.home(styleParam ?? sessionStyle);
 
   return (
     <div className="mt-3 flex gap-5 overflow-x-auto border-b border-[#ededed] px-5">

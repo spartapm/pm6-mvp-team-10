@@ -1,5 +1,12 @@
 import type { OnboardingResult, StyleName } from "./types";
 
+export function getSessionHomeStyle(
+  result: OnboardingResult | null | undefined,
+): StyleName | null {
+  if (!result || result.type === "all-disliked") return null;
+  return result.primaryStyle ?? result.randomStyle ?? null;
+}
+
 export const routes = {
   home: (style?: StyleName | string | null) => {
     if (!style) return "/";

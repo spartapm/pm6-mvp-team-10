@@ -1,9 +1,9 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import HomeContent from "@/components/home/HomeContent";
-import { routes } from "@/lib/routes";
+import { getSessionHomeStyle, routes } from "@/lib/routes";
 import { getSession } from "@/lib/storage";
 
 function LoadingScreen() {
@@ -14,8 +14,9 @@ function LoadingScreen() {
   );
 }
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -24,16 +25,29 @@ export default function HomePage() {
       router.replace(routes.onboarding.root);
       return;
     }
+
+    const sessionStyle = getSessionHomeStyle(session.result);
+    const paramStyle = searchParams.get("style");
+
+    if (sessionStyle && !paramStyle) {
+      router.replace(routes.home(sessionStyle));
+      return;
+    }
+
     setReady(true);
-  }, [router]);
+  }, [router, searchParams]);
 
   if (!ready) {
     return <LoadingScreen />;
   }
 
+  return <HomeContent />;
+}
+
+export default function HomePage() {
   return (
     <Suspense fallback={<LoadingScreen />}>
-      <HomeContent />
+      <HomePageContent />
     </Suspense>
   );
 }

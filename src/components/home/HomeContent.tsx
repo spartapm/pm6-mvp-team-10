@@ -10,14 +10,18 @@ import {
   getHomeContentsByStyle,
   getProductsByStyle,
 } from "@/data/mock-data";
+import { useOnboarding } from "@/context/onboarding-context";
+import { getSessionHomeStyle } from "@/lib/routes";
 import type { StyleName } from "@/lib/types";
 
 export default function HomeContent() {
   const searchParams = useSearchParams();
+  const { session } = useOnboarding();
 
   const styleParam = searchParams.get("style") as StyleName | null;
-  const isPersonalized = Boolean(styleParam);
-  const activeStyle: StyleName = styleParam ?? "미니멀";
+  const sessionStyle = getSessionHomeStyle(session.result);
+  const activeStyle: StyleName = styleParam ?? sessionStyle ?? "미니멀";
+  const isPersonalized = Boolean(styleParam ?? sessionStyle);
   const products = getProductsByStyle(activeStyle);
   const brands = getBrandsByStyle(activeStyle);
   const homeContents = getHomeContentsByStyle(activeStyle);
